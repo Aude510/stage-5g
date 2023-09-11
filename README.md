@@ -40,7 +40,7 @@ Utilisation :
 -h : print help
 ```
 
-**- manage-data.sh** Script en bash pour effectuer des statistiques sur les connexions des UE grâce aux logs du Core Network.  En l'état, calcule uniquement la moyenne. 
+**- manage-data.sh** Script en bash pour effectuer des statistiques sur les connexions des UE grâce aux logs du Core Network.  En l'état, calcule uniquement la moyenne des durées de connexion. 
 ```
 Utilisation :
 -d <date> : traite les données de <date> au format yyyy-mm-dd
@@ -49,7 +49,7 @@ Utilisation :
 -h : print help
 ```
 
-**- generer-traffic.sh** Script en python pour générer du trafic du gnb vers l'UE avec iperf en testant divers paramètres. 
+**- generer-traffic.sh** Script en python pour générer du trafic du gNB vers l'UE avec iperf en testant divers paramètres (BW, protocole...). 
 
 ### Wattmètre 
 
