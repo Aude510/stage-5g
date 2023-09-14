@@ -21,7 +21,7 @@ def find_index(heure: str, times: [str]) -> int: # hh:mm:ss
 
 def find_index1(heure1: str, times: [str]) -> int: # hh:mm
     index1=-1
-    if index1!='None':
+    if heure1:
         regex1=heure1+':\d{2},\d{3}'
         for (heure, index) in zip(times, range(len(times))):
             if re.search(regex1,heure):
@@ -35,7 +35,7 @@ def find_index2(index1: int, heure2: str, times: [str]) -> int:
     if index1>0: # index 1 n'est ni -1 (pas trouvé) ni 0 (inutile)
         debut=index1+1 # le +1 pour éviter de repasser par index1 
 
-    if heure2!='None':
+    if heure2:
         regex2=heure2+':\d{2},\d{3}'
         for (heure, index) in zip(times[debut:], range(debut,len(times))): 
             if re.search(regex2,heure):
@@ -52,22 +52,22 @@ def get_indexes(heure1: str, heure2:str, times: [str]) -> (int, int):
     return (index1,index2)
 
 def test_get_indexes():
-    data = pd.read_csv('24-08-gnb.txt',sep='\t')
+    data = pd.read_csv('24-08-11h21-gnb.txt',sep='\t')
     times=data['Time']
     print("get 11:22 et 11:25 ; 104 et 703")
     (index1,index2)=get_indexes("11:22","11:25",times)
     print(index1)
     print(index2)
-    print("get 13:00 et 'None'; 19657 et -1")
-    (index1,index2)=get_indexes("13:00","None",times)
+    print("get 13:00 et None; 19657 et -1")
+    (index1,index2)=get_indexes("13:00",None,times)
     print(index1)
     print(index2)
     print("get None et 13:00 ; -1 et 19657")    
-    (index1,index2)=get_indexes("None","13:00",times)
+    (index1,index2)=get_indexes(None,"13:00",times)
     print(index1)
     print(index2)
     print("get None et None ; -1 et -1")
-    (index1,index2)=get_indexes("None","None",times)
+    (index1,index2)=get_indexes(None,None,times)
     print(index1)
     print(index2)
 
@@ -166,17 +166,17 @@ def test_traiter_fichier():
     print("\n")
     traiter_fichier('gnb.csv',100,'11:22','11:25')
     print("\n")
-    traiter_fichier('gnb.csv',1,'13:00','None')
+    traiter_fichier('gnb.csv',1,'13:00',None)
     print("\n")
-    traiter_fichier('gnb.csv',100,'13:00','None')
+    traiter_fichier('gnb.csv',100,'13:00',None)
     print("\n")
-    traiter_fichier('gnb.csv',1,'None','13:00')
+    traiter_fichier('gnb.csv',1,None,'13:00')
     print("\n")
-    traiter_fichier('gnb.csv',100,'None','13:00')
+    traiter_fichier('gnb.csv',100,None,'13:00')
     print("\n")
-    traiter_fichier('gnb.csv',1,'None','None')
+    traiter_fichier('gnb.csv',1,None,None)
     print("\n")
-    traiter_fichier('gnb.csv',100,'None','None')
+    traiter_fichier('gnb.csv',100,None,None)
     print("\n")
     traiter_fichier('gnb.csv',100,'13:00','11:24')
     print("\n")
@@ -200,11 +200,11 @@ def parser_et_run():
                         help='precision of hour display; 1=1x/minut, 10=1x/10min, -10=10x/minut; default 1') 
                         # en considérant une mesure toutes les 300ms soit 200 / minute 
 
-    parser.add_argument('--hour1', type=str, nargs='?', const='None', default='None',
+    parser.add_argument('--hour1', type=str, nargs='?', const=None, default=None,
                         help='filter the file between specific hours; default none; format hh:mm')
 
 
-    parser.add_argument('--hour2', type=str, nargs='?', const='None', default='None',
+    parser.add_argument('--hour2', type=str, nargs='?', const=None, default=None,
                         help='filter the file between specific hours; default none; format hh:mm ')
     
     parser.add_argument('-a','--annotations',nargs='?', type=str,
