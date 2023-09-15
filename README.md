@@ -40,7 +40,7 @@ Utilisation :
 -h : print help
 ```
 
-**- manage-data.sh** Script en bash pour effectuer des statistiques sur les connexions des UE grâce aux logs du Core Network.  En l'état, calcule uniquement la moyenne des durées de connexion. 
+**- manage-data.sh** Script en bash pour effectuer des statistiques sur les connexions des UE grâce aux logs du Core Network.  En l'état, calcule uniquement la moyenne des durées de connexion. Exporte les dates de début et durée des connexions (en secondes) dans un fichier json. 
 ```
 Utilisation :
 -d <date> : traite les données de <date> au format yyyy-mm-dd

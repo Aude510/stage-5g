@@ -1,9 +1,10 @@
 #!/bin/bash -i
 
 
-template='{"time":replace_time,"text":"replace_etat of UE replace_imsi","tags":["replace_etat","replace_imsi"]}'
-token="glsa_AfJIfIUzA4SAc1gtKWR4I3DoAbp9cIGy_cb610202"
+touch stats-connexion-$(date +%d-%m-%Hh%M).json
 
+echo "{}" >> stats-connexion-$(date +%d-%m-%Hh%M).json
+ 
 
 print_help () {
 	echo "Utilisation : "
@@ -20,6 +21,7 @@ moyenne () { # $1 tableau avec les durées, $2 nb d'éléments
 
 tab=("$1")
 sum=0
+#echo ${tab[*]}
 for i in $tab
 do
 	sum=$(($sum+$i))
@@ -64,7 +66,9 @@ traiter_all () {
 
 
 
+
 logs=$(mktemp)
+
 
 
 # récupération des logs de l'amf...
@@ -76,7 +80,7 @@ cat $logs -n | grep "Received UE_CONTEXT_RELEASE_COMPLETE message, handling" > $
 
 # connexions 
 conex=$(mktemp)
-cat $logs -n | grep "has been registered to the network"  > $conex
+cat $logs -n | grep "has been registered to the network" > $conex
 
 rm $logs
 
@@ -97,7 +101,7 @@ while read line_co; do
 	index=$(echo $line_co | awk '{print $1;}')
 	# premier mot de la première ligne du fichier 
 	index_deco=$(head $deco -n 1 | awk '{print $1;}')
-#	echo "conexion $tours : $index"
+	echo "conexion $tours : $index"
 #	echo "deconexion $tours : $index_deco"
 	((tours++))
 	# enlever les $tours premières lignes du fichier, prendre la première, et le premier mot (index)
@@ -111,18 +115,25 @@ while read line_co; do
 		fin=$(date -d "$fin" +%s)
 #		echo $debut
 #		echo $fin
+		echo "debut : $(date -d "@$debut" +"%Hh%Mmin %Ss")"
+		echo "fin : $(date -d "@$fin" +"%Hh%Mmin %Ss")"
 		duree=$((fin-debut))
-#		echo "durée : $duree s"
-#		echo "durée : $(date -d "@$duree" +"%Mmin %Ss")"
+		echo "durée : $duree s"
+		echo "durée : $(date -d "@$duree" +"%Mmin %Ss")"
+		if [[ $duree -lt 0 ]]; then 
+			let duree=0
+			((durees_calculees++))
+		fi
 		tab_durees[durees_calculees]=$duree
 		((durees_calculees++))
+		jq -c ".\"$(date -d @$((debut)) +%F-%R:%S)\" = \"$duree\"" stats-connexion-$(date +%d-%m-%Hh%M).json > tmp.$$.json && mv tmp.$$.json stats-connexion-$(date +%d-%m-%Hh%M).json
 		######## on enlève cette ligne du fichier des déconnexions #####################
 		old_deco=$deco
 		deco=$(mktemp)
 		tail $old_deco -n $(($nb_deco-$durees_calculees)) > $deco
 		rm $old_deco
 	else 
-		echo "il n'y a pas eu de déconnexion pour la connexion $(($tours-1))"
+		echo "il n'y a pas eu de déconnexion pour la connexion $(($tours))"
 	fi 
 	
 done < $conex
@@ -130,7 +141,10 @@ done < $conex
 rm $conex 
 rm $deco
 
-print_data $nb_conex "${tab_durees[*]}" $durees_calculees # passage du tableau en string 
+#echo "${tab_durees[*]}"
+
+print_data $nb_conex "${tab_durees[*]}" $durees_calculees $1 # passage du tableau en string 
+
 }
 
 
@@ -172,7 +186,7 @@ while read line_co; do
 	index=$(echo $line_co | awk '{print $1;}')
 	# premier mot de la première ligne du fichier 
 	index_deco=$(head $deco -n 1 | awk '{print $1;}')
-#	echo "conexion $tours : $index"
+	echo "conexion $tours : $index"
 #	echo "deconexion $tours : $index_deco"
 	((tours++))
 	# enlever les $tours premières lignes du fichier, prendre la première, et le premier mot (index)
@@ -186,11 +200,18 @@ while read line_co; do
 		fin=$(date -d "$fin" +%s)
 #		echo $debut
 #		echo $fin
+		echo "debut : $(date -d "@$debut" +"%Hh%Mmin %Ss")"
+		echo "fin : $(date -d "@$fin" +"%Hh%Mmin %Ss")"
 		duree=$((fin-debut))
-#		echo "durée : $duree s"
-#		echo "durée : $(date -d "@$duree" +"%Mmin %Ss")"
+		echo "durée : $duree s"
+		echo "durée : $(date -d "@$duree" +"%Mmin %Ss")"
+		if [[ $duree -lt 0 ]]; then 
+			let duree=0
+			((durees_calculees++))
+		fi
 		tab_durees[durees_calculees]=$duree
 		((durees_calculees++))
+		jq -c ".\"$(date -d @$((debut)) +%F-%R:%S)\" = \"$duree\"" stats-connexion-$(date +%d-%m-%Hh%M).json > tmp.$$.json && mv tmp.$$.json stats-connexion-$(date +%d-%m-%Hh%M).json
 		######## on enlève cette ligne du fichier des déconnexions #####################
 		old_deco=$deco
 		deco=$(mktemp)
